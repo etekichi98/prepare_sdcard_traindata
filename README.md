@@ -1,0 +1,2 @@
+# prepare_yolov3_sdcards_traindata_take2
+# prepare_sdcard_traindata
