@@ -73,7 +73,7 @@ def make_rotated_images(data_path, image_path, annotation_path, img_name, class_
                                             obj_x, obj_y, obj_x+obj_w, obj_y+obj_h)
                         with open(annotation_path+'{}.txt'.format(file_name), 'w') as fa:
                             fa.write(annotation_text)
-                    if yolo_version=='tolov3':
+                    if yolo_version=='yolov3':
                         ft.write('{}{}.jpg {},{},{},{}, {}\n'.format(
                             image_path, file_name, obj_x, obj_y, obj_x+obj_w, obj_y+obj_h, class_name[1]))
                 
