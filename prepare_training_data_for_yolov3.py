@@ -2,8 +2,6 @@ import os
 import cv2
 import numpy as np
 
-yolo_version = 'yolov3'
-
 def extract_contours(img):
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_gray = cv2.medianBlur(img_gray,5)
@@ -13,7 +11,7 @@ def extract_contours(img):
     contours, hierarchy = cv2.findContours(img_bin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     return contours
 
-def make_rotated_images(data_path, image_path, annotation_path, img_name, class_name):
+def make_rotated_images(data_path, image_path, img_name, class_name):
     img_orig = cv2.imread(img_name+'.jpg')
     contours = extract_contours(img_orig)
     # 輪郭を描画
@@ -66,44 +64,22 @@ def make_rotated_images(data_path, image_path, annotation_path, img_name, class_
                     iy = int(angle/60)
                     image_6x6[iy*rot_img_size:(iy+1)*rot_img_size,
                               ix*rot_img_size:(ix+1)*rot_img_size] = img_obj
-                    if yolo_version=='tolov4':
-                        # アノテーション書き出し
-                        annotation_text = make_yolo_annotation(image_path, file_name,
-                                            rot_img_size, rot_img_size, class_name[1],
-                                            obj_x, obj_y, obj_x+obj_w, obj_y+obj_h)
-                        with open(annotation_path+'{}.txt'.format(file_name), 'w') as fa:
-                            fa.write(annotation_text)
-                    if yolo_version=='yolov3':
-                        ft.write('{}{}.jpg {},{},{},{},{}\n'.format(
-                            image_path, file_name, obj_x, obj_y, obj_x+obj_w, obj_y+obj_h, class_name[1]))
+                    ft.write('{}{}.jpg {},{},{},{},{}\n'.format(
+                        image_path, file_name, obj_x, obj_y, obj_x+obj_w, obj_y+obj_h, class_name[1]))
                 
                 # 確認用のアノテーション付き教師画像書き出し
                 #cv2.imwrite(data_path+'{}_{}.jpg'.format(img_name, count), image_6x6)
     #cv2.imwrite(data_path+img_name+'_contours1.jpg', img_con)
 
-def make_yolo_annotation(image_path, img_name, img_width, img_height, class_id, xmin, ymin, xmax, ymax):
-    '''
-    YOLO形式のアノテーション(yolov4)
-    '''
-    xcenter = (xmax + xmin)/img_width/2.0
-    ycenter = (ymax + ymin)/img_height/2.0
-    width = (xmax - xmin)/img_width
-    height = (ymax - ymin)/img_height
-    annotation_text = '{} {} {} {} {}\n'.format(class_id, xcenter, ycenter, width, height)
-    return annotation_text
-
 def main():
     data_path = './data/'
-    annotation_path = data_path + 'Annotations/'
     image_path = data_path + 'Images/'
     os.makedirs(data_path, exist_ok=True)
     os.makedirs(image_path, exist_ok=True)
-    if yolo_version=='tolov4':
-        os.makedirs(annotation_path, exist_ok=True)
     img_names = ['SD_FRONT_1', 'SD_FRONT_5', 'SD_BACK_1', 'SD_BACK_5']
     class_names = [('sd_front',0), ('sd_front',0), ('sd_back',1), ('sd_back',1)]
     for img_name, class_name in zip(img_names, class_names):
-        make_rotated_images(data_path, image_path, annotation_path, img_name, class_name)
+        make_rotated_images(data_path, image_path, img_name, class_name)
 
 if __name__ == '__main__':
     main()
