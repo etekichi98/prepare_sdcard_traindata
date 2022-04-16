@@ -70,8 +70,11 @@ def calc_extent(img_obj):
     return 0, 0, 0, 0
 
 def make_training_images(image_path, sdcard_images, sdcard_classes):
+    with open('./train.txt', 'w') as ft:
+        pass
     with open('./train.txt', 'a') as ft:
         for i in range(100):
+            ft.write('{}{}.jpg'.format(image_path, str(i)))
             train_image = np.zeros((rot_img_size*3, rot_img_size*3, 3), np.uint8)
             train_image[:] = 225
             for j in range(9):
@@ -103,9 +106,9 @@ def make_training_images(image_path, sdcard_images, sdcard_classes):
                 obj_x = obj_x + pos_x
                 obj_y = obj_y + pos_y
                 #cv2.rectangle(train_image, (obj_x, obj_y), (obj_x+obj_w, obj_y+obj_h), (0, 0, 255), 7)
-                ft.write('{}{}.jpg {},{},{},{},{}\n'.format(
-                    image_path, str(i), obj_x, obj_y, obj_x+obj_w, obj_y+obj_h, sdcard_class[1]))
-    
+                ft.write(' {},{},{},{},{}'.format(
+                    obj_x, obj_y, obj_x+obj_w, obj_y+obj_h, sdcard_class[1]))
+            ft.write('\n')
             cv2.imwrite(image_path+'{}.jpg'.format(i), train_image)
 
 
